@@ -1,0 +1,19 @@
+{
+  "name": "visualization",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "serve": "./node_modules/.bin/http-server"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "openafpm-cad-visualization": "git+https://github.com/gbroques/openafpm-cad-visualization.git#d3245d902e94c9a1a1cae494dc9f152c1c609f0d"
+  },
+  "devDependencies": {
+    "http-server": "^14.1.1"
+  }
+}

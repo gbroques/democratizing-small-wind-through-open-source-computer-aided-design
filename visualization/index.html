@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Cache-control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <link rel="icon" type="image/png" sizes="16x16" href="favicon.png">
+  <title>OpenAFPM CAD Visualization</title>
+  <style>
+    :root {
+      --spacing: 8px;
+    }
+    html[data-theme='light'] {
+      --primary-color-main: #43A047; /* Green 600 - https://www.materialui.co/colors */
+      --background-default: #FFFFFF;
+      --text-color: rgba(0, 0, 0, 0.87);
+    }
+    html[data-theme='dark'] {
+      --primary-color-main: #404040;
+      --background-default: #212121;
+      --text-color: #FFFFFF;
+    }
+    body {
+      margin: 0;
+      font-family: sans-serif;
+      font-size: 16px;
+      background-color: var(--background-default);
+      color: var(--text-color);
+    }
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background-color: var(--primary-color-main);
+      color: white;
+      font-weight: bold;
+      font-size: 1.125rem;
+      padding: calc(var(--spacing) * 2);
+      box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.5);
+    }
+    </style>
+</head>
+<body>
+  <header>
+    OpenAFPM CAD Visualization
+  </header>
+  <div id="container"></div>
+  <script type="module">
+    import OpenAfpmCadVisualization from './node_modules/openafpm-cad-visualization/public/openafpm-cad-visualization.js';
+    const getHeaderHeight = () => {
+      const header = document.getElementsByTagName('header')[0];
+      return header.offsetHeight;
+    };
+    const rootDomElement = document.getElementById('container');
+    const theme = document.documentElement.getAttribute('data-theme');
+    rootDomElement.setAttribute('data-theme', theme);
+    const setRootDomElementHeight = () => {
+      rootDomElement.style.height = window.innerHeight - getHeaderHeight() + 'px';
+    };
+    setRootDomElementHeight();
+    const openAfpmCadVisualization = new OpenAfpmCadVisualization({
+      rootDomElement,
+      width: window.innerWidth,
+      height: window.innerHeight - getHeaderHeight()
+    });
+    const handleResize = () => {
+      setRootDomElementHeight();
+      openAfpmCadVisualization.resize(window.innerWidth, window.innerHeight - getHeaderHeight());
+    };
+    window.addEventListener('resize', handleResize, false);
+
+    function loadAssembly(objUrl, assembly, furlTransform = null) {
+      const theme = document.documentElement.getAttribute("data-theme");
+      const loadObj = () => fetch(objUrl).then(response => response.text());
+      const furlTransformPromise = Promise.resolve(furlTransform);
+      openAfpmCadVisualization.visualize(loadObj, assembly, furlTransformPromise);
+      const handleMouseMove = (event) => {
+        openAfpmCadVisualization.handleMouseMove(event);
+      };
+      window.addEventListener('mousemove', handleMouseMove, false);
+      return () => window.removeEventListener('mousemove', handleMouseMove);
+    }
+    fetch('furlTransform.json')
+      .then(r => r.json())
+      .then(furlTransform => {
+        const objUrl = 'wind-turbine.obj';
+        loadAssembly(
+          objUrl,
+          'WindTurbine',
+          furlTransform
+        );
+      });
+    
+  </script>
+</body>
+</html>
